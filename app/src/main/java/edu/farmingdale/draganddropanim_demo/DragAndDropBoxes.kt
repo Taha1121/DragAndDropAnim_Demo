@@ -4,7 +4,6 @@ package edu.farmingdale.draganddropanim_demo
 
 import android.content.ClipData
 import android.content.ClipDescription
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -38,28 +37,25 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.translate
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
 
 @Composable
 fun DragAndDropBoxes(modifier: Modifier = Modifier) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    var rotationAngle by remember { mutableStateOf(0f) }
 
+    Column(modifier = Modifier.fillMaxSize()) {
         Row(
             modifier = modifier
                 .fillMaxWidth()
                 .weight(0.2f)
         ) {
             val boxCount = 4
-            var dragBoxIndex by remember {
-                mutableIntStateOf(0)
-            }
+            var dragBoxIndex by remember { mutableIntStateOf(0) }
 
             repeat(boxCount) { index ->
                 Box(
@@ -70,14 +66,11 @@ fun DragAndDropBoxes(modifier: Modifier = Modifier) {
                         .border(1.dp, Color.Black)
                         .dragAndDropTarget(
                             shouldStartDragAndDrop = { event ->
-                                event
-                                    .mimeTypes()
-                                    .contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                                event.mimeTypes().contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
                             },
                             target = remember {
                                 object : DragAndDropTarget {
                                     override fun onDrop(event: DragAndDropEvent): Boolean {
-
                                         dragBoxIndex = index
                                         return true
                                     }
@@ -86,50 +79,60 @@ fun DragAndDropBoxes(modifier: Modifier = Modifier) {
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    this@Row.AnimatedVisibility(
+                    androidx.compose.animation.AnimatedVisibility(
                         visible = index == dragBoxIndex,
                         enter = scaleIn() + fadeIn(),
                         exit = scaleOut() + fadeOut()
                     ) {
-                        Icon(imageVector = Icons.Default.Face, contentDescription = "face"
-                            , modifier = Modifier
+                        Icon(
+                            imageVector = Icons.Default.Face,
+                            contentDescription = "face",
+                            modifier = Modifier
                                 .fillMaxSize()
                                 .dragAndDropSource {
                                     detectTapGestures(
                                         onLongPress = { offset ->
                                             startTransfer(
                                                 transferData = DragAndDropTransferData(
-                                                    clipData = ClipData.newPlainText(
-                                                        "text",
-                                                        ""
-                                                    )
+                                                    clipData = ClipData.newPlainText("text", "")
                                                 )
                                             )
                                         }
                                     )
-
-                    }
-
+                                }
                         )
                     }
                 }
             }
         }
 
-
+        // Canvas which also has the rect rotating
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(0.8f)
                 .background(Color.Red)
-
+                .graphicsLayer(
+                    rotationZ = rotationAngle,
+                    transformOrigin = androidx.compose.ui.graphics.TransformOrigin.Center
+                )
         ) {
-                //drawCircle(Color.Green, radius = 50f, center = Offset(100f, 100f))
-                translate(left = 100f, top = 100f){
-                    drawRect(Color.Green, size = Size(100f, 100f) )
+            drawRect(
+                color = Color.Green,
+                size = Size(100f, 100f),
+                topLeft = Offset((size.width - 100f) / 2, (size.height - 100f) / 2)
+            )
+        }
 
-                }
-       }
+        // Button to Rotate the Rectangle
+        androidx.compose.material3.Button(
+            onClick = {
+                rotationAngle += 35f
+                if (rotationAngle >= 360f) rotationAngle = 0f
+            },
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("Rotate Rectangle")
+        }
     }
 }
-
