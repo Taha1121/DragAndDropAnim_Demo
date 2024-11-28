@@ -35,8 +35,13 @@ import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.foundation.Canvas
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material3.Icon
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,7 +53,8 @@ fun DragAndDropBoxes(modifier: Modifier = Modifier) {
 
         Row(
             modifier = modifier
-                .fillMaxWidth().weight(0.2f)
+                .fillMaxWidth()
+                .weight(0.2f)
         ) {
             val boxCount = 4
             var dragBoxIndex by remember {
@@ -85,13 +91,8 @@ fun DragAndDropBoxes(modifier: Modifier = Modifier) {
                         enter = scaleIn() + fadeIn(),
                         exit = scaleOut() + fadeOut()
                     ) {
-                        Text(
-                            text = "Right",
-                            fontSize = 40.sp,
-                            color = Color.Red,
-                            fontWeight = FontWeight.Bold,
-
-                            modifier = Modifier
+                        Icon(imageVector = Icons.Default.Face, contentDescription = "face"
+                            , modifier = Modifier
                                 .fillMaxSize()
                                 .dragAndDropSource {
                                     detectTapGestures(
@@ -106,7 +107,9 @@ fun DragAndDropBoxes(modifier: Modifier = Modifier) {
                                             )
                                         }
                                     )
-                                }
+
+                    }
+
                         )
                     }
                 }
@@ -121,7 +124,11 @@ fun DragAndDropBoxes(modifier: Modifier = Modifier) {
                 .background(Color.Red)
 
         ) {
-                drawCircle(Color.Green, radius = 50f, center = Offset(100f, 100f))
+                //drawCircle(Color.Green, radius = 50f, center = Offset(100f, 100f))
+                translate(left = 100f, top = 100f){
+                    drawRect(Color.Green, size = Size(100f, 100f) )
+
+                }
        }
     }
 }
